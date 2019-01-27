@@ -79,6 +79,10 @@ successor of two; and so on.
 
 Write out `7` in longhand.
 
+\begin{code}
+seven : ℕ
+seven = suc (suc (suc (suc (suc (suc zero)))))
+\end{code}
 
 ## Unpacking the inference rules
 
@@ -424,6 +428,10 @@ other word for evidence, which we will use interchangeably, is _proof_.
 
 Compute `3 + 4`, writing out your reasoning as a chain of equations.
 
+\begin{code}
+_ : 3 + 4 ≡ 7
+_ = refl
+\end{code}
 
 ## Multiplication
 
@@ -481,6 +489,10 @@ it can easily be inferred from the corresponding term.
 
 Compute `3 * 4`, writing out your reasoning as a chain of equations.
 
+\begin{code}
+_ : 3 * 4 ≡ 12
+_ = refl
+\end{code}
 
 #### Exercise `_^_` (recommended) {#power}
 
@@ -489,8 +501,18 @@ Define exponentiation, which is given by the following equations:
     n ^ 0        =  1
     n ^ (1 + m)  =  n * (n ^ m)
 
+\begin{code}
+_^_ : ℕ → ℕ → ℕ
+n ^ zero = suc zero
+n ^ suc m = n * (n ^ m)
+\end{code}
+
 Check that `3 ^ 4` is `81`.
 
+\begin{code}
+_ : 3 ^ 4 ≡ 81
+_ = refl
+\end{code}
 
 ## Monus
 
@@ -551,6 +573,12 @@ _ =
 
 Compute `5 ∸ 3` and `3 ∸ 5`, writing out your reasoning as a chain of equations.
 
+\begin{code}
+_ : 5 ∸ 3 ≡ 2
+_ = refl
+_ : 3 ∸ 5 ≡ 0
+_ = refl
+\end{code}
 
 ## Precedence
 
@@ -880,14 +908,70 @@ number.  For example, since `1100` encodes twelve, we should have:
 
     inc (x1 x1 x0 x1 nil) ≡ x0 x0 x1 x1 nil
 
+\begin{code}
+inc : Bin → Bin
+inc nil = nil
+inc (x0 nil) = (x1 nil)
+inc (x0 (x0 x)) = (x0 (x1 x))
+inc (x0 (x1 x)) = (x1 (x0 x))
+inc (x1 nil) = (x1 (x0 nil))
+inc (x1 (x0 x)) = (x1 (x1 x))
+inc (x1 (x1 x)) = (x1 (x0 (x0 x)))
+\end{code}
+
 Confirm that this gives the correct answer for the bitstrings
 encoding zero through four.
+
+\begin{code}
+zerob : Bin
+zerob = x0 nil
+oneb : Bin
+oneb = inc zerob
+twob : Bin
+twob = inc oneb
+threeb : Bin
+threeb = inc twob
+fourb : Bin
+fourb = inc threeb
+\end{code}
 
 Using the above, define a pair of functions to convert
 between the two representations.
 
     to   : ℕ → Bin
     from : Bin → ℕ
+
+\begin{code}
+to : ℕ → Bin
+to zero = x0 nil
+to (suc n) = inc (to n)
+_ : (to 0) ≡ zerob
+_ = refl
+_ : (to 1) ≡ oneb
+_ = refl
+_ : (to 2) ≡ twob
+_ = refl
+_ : (to 3) ≡ threeb
+_ = refl
+_ : (to 4) ≡ fourb
+_ = refl
+from : Bin → ℕ
+from nil = zero
+from (x0_ nil) = zero
+from (x1_ nil) = suc zero
+from (x (x0_ nil)) = 2 * (from (x nil))
+from (x (x1_ nil)) = suc (2 * (from (x nil)))
+_ : (from zerob) ≡ 0
+_ = refl
+_ : (from oneb) ≡ 1
+_ = refl
+_ : (from twob) ≡ 2
+_ = refl
+_ : (from threeb) ≡ 3
+_ = refl
+_ : (from fourb) ≡ 4
+_ = refl
+\end{code}
 
 For the former, choose the bitstring to have no leading zeros if it
 represents a positive natural, and represent zero by `x0 nil`.
